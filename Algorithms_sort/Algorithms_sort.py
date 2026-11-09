@@ -23,52 +23,53 @@ def insertion_sort(default_list):
 
     for i in range(1, len(vec)):
         key_value = vec[i]
-        j = i - 1
-
-        while j >= 0:
+        
+        left = 0
+        right = i
+        while left < right:
             count += 1
-            if vec[j] > key_value:
-                vec[j + 1] = vec[j]
-                j -= 1
+            mid = (left + right) // 2
+            if vec[mid] <= key_value:
+                left = mid + 1
             else:
-                break
-        vec[j + 1] = key_value
+                right = mid
+                
+        vec.insert(left, key_value)
+        vec.pop(i + 1)
 
     print(f"Количество сравнений вставками: {count}")
     return vec
 
-def sort_for_hoar(vec, left, right, count):
-    i = left
-    j = right
+def sort_for_hoar(vec, count):
+    # Если массив пустой или из одного элемента
+    if len(vec) <= 1:
+        return vec
 
-    pivot = vec[(left + right) // 2]
+    pivot = vec[len(vec) // 2] # Выбираем опорный элемент
+    left_part = []
+    right_part = []
+    equal_part = []
 
-    while i <= j:
-        while vec[i] < pivot:
-            count[0] += 1
-            i += 1
+    for x in vec:
+        count[0] += 1 # Считаем сравнения с опорным элементом
+        if x < pivot:
+            left_part.append(x)
+        elif x > pivot:
+            right_part.append(x)
+        else:
+            equal_part.append(x)
 
-        while vec[j] > pivot:
-            count[0] += 1
-            j -= 1
-
-        if i <= j:
-            vec[i], vec[j] = vec[j], vec[i]
-            i += 1
-            j -= 1
-
-    if left < j:
-        sort_for_hoar(vec, left, j, count)
-    if i < right:
-        sort_for_hoar(vec, i, right, count)
+    # Рекурсивно сортируем левую и правую части и складываем
+    return sort_for_hoar(left_part, count) + equal_part + sort_for_hoar(right_part, count)
 
 def hoar_sort(default_list):
     vec = default_list.copy()
     count = [0]
-    sort_for_hoar(vec, 0, len(vec) - 1, count)
+    
+    sorted_vec = sort_for_hoar(vec, count)
 
     print(f"Количество сравнений в методе Хоара: {count[0]}")
-    return vec
+    return sorted_vec
 
 def main():
     default_list = generate(10)
@@ -80,16 +81,15 @@ def main():
     print("Отсортированный массив:", pop_sorted_vector)
     print("\n")
 
-    print("Сортировка вставками:")
+    print("Сортировка вставками (бинарный поиск + insert):")
     insert_sorted_vector = insertion_sort(default_list)
     print("Отсортированный массив:", insert_sorted_vector)
     print("\n")
 
-    print("Сортировка методом Хоара:")
+    print("Сортировка методом Хоара (с созданием новых массивов):")
     hoar_sorted_vector = hoar_sort(default_list)
     print("Отсортированный массив:", hoar_sorted_vector)
     print("\n")
 
 if __name__ == "__main__":
     main()
-
